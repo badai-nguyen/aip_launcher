@@ -15,6 +15,7 @@
   <arg name="view_direction" default="0.0" />
   <arg name="view_width" default="6.28" />
   <arg name="vehicle_mirror_param_file" />
+  <arg name="dual_return_filter_param_file" default="$(find-pkg-share common_sensor_launch)/config/dual_return_filter.param.yaml" />
 
   <include file="$(find-pkg-share common_sensor_launch)/launch/velodyne_node_container.launch.py">
     <arg name="launch_driver" value="$(var launch_driver)"/>
@@ -32,6 +33,7 @@
     <arg name="vehicle_mirror_param_file" value="$(var vehicle_mirror_param_file)" />
     <arg name="use_intra_process" value="true" />
     <arg name="use_multithread" value="false" />
+    <arg name="dual_return_filter_param_file" value="$(var dual_return_filter_param_file)" />
   </include>
 
   <!-- Velodyne Monitor -->

@@ -18,12 +18,18 @@ from launch.actions import OpaqueFunction
 from launch.actions import SetLaunchConfiguration
 from launch.conditions import IfCondition
 from launch.conditions import UnlessCondition
+from launch.conditions import LaunchConfigurationEquals
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.actions import LoadComposableNodes
 from launch_ros.descriptions import ComposableNode
 import yaml
 
+def get_dual_return_filter_info(context):
+    path = LaunchConfiguration("dual_return_filter_param_file").perform(context)
+    with open(path,"r") as f:
+        p = yaml.safe_load(f)["/**"]["ros__parameters"]
+    return p
 
 def get_vehicle_info(context):
     # TODO(TIER IV): Use Parameter Substitution after we drop Galactic support
@@ -78,6 +84,7 @@ def launch_setup(context, *args, **kwargs):
                         "scan_phase",
                         "view_direction",
                         "view_width",
+                        "return_mode",
                     ),
                 }
             ],
@@ -89,6 +96,7 @@ def launch_setup(context, *args, **kwargs):
         )
     )
 
+    dual_return_filter_info = get_dual_return_filter_info(context)
     cropbox_parameters = create_parameter_dict("input_frame", "output_frame")
     cropbox_parameters["negative"] = True
 
@@ -198,6 +206,25 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    dual_return_filter_component = ComposableNode(
+        package="pointcloud_preprocessor",
+        plugin="pointcloud_preprocessor::DualReturnOutlierFilterComponent",
+        name="dual_return_filter",
+        remappings=[
+            ("input","rectified/pointcloud_ex"),
+            ("output","outlier_filtered/pointcloud")
+        ],
+        parameters=[
+            {
+                "vertical_bins":LaunchConfiguration("vertical_bins"),
+                "min_azimuth_deg": LaunchConfiguration("min_azimuth_deg"),
+                "max_azimuth_deg": LaunchConfiguration("max_azimuth_deg"),
+            }
+        ]+
+        [dual_return_filter_info],
+        extra_arguments=[{"use_intra_process_comms":LaunchConfiguration("use_intra_process")}],
+    )
+
     # one way to add a ComposableNode conditional on a launch argument to a
     # container. The `ComposableNode` itself doesn't accept a condition
     loader = LoadComposableNodes(
@@ -205,8 +232,12 @@ def launch_setup(context, *args, **kwargs):
         target_container=container,
         condition=launch.conditions.IfCondition(LaunchConfiguration("launch_driver")),
     )
-
-    return [container, loader]
+    dual_return_filter_loader = LoadComposableNodes(
+        composable_node_descriptions=[dual_return_filter_component],
+        target_container=container,
+        condition=LaunchConfigurationEquals("return_mode","Dual")
+    )
+    return [container, loader, dual_return_filter_loader]
 
 
 def generate_launch_description():
@@ -248,6 +279,10 @@ def generate_launch_description():
     )
     add_launch_arg("use_multithread", "False", "use multithread")
     add_launch_arg("use_intra_process", "False", "use ROS2 component container communication")
+    add_launch_arg("vertical_bins","128")
+    add_launch_arg("return_mode","Strongest")
+    add_launch_arg("min_azimuth_deg", "0.0")
+    add_launch_arg("max_azimuth_deg", "360.0")
 
     set_container_executable = SetLaunchConfiguration(
         "container_executable",
