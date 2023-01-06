@@ -21,6 +21,10 @@
   <arg name="is_channel_order_top2down" default="false"/>
   <arg name="horizontal_resolution" default="0.4"/>
   <arg name="enable_blockage_diag" default="true"/>
+  <arg name="view_direction" default="0.0" />
+  <arg name="view_width" default="6.28" />
+  <arg name="vehicle_mirror_param_file" />
+  <arg name="dual_return_filter_param_file" default="$(find-pkg-share common_sensor_launch)/config/dual_return_filter.param.yaml" />
 
   <include file="$(find-pkg-share common_sensor_launch)/launch/nebula_node_container.launch.py">
     <arg name="launch_driver" value="$(var launch_driver)"/>
@@ -44,6 +48,12 @@
     <arg name="is_channel_order_top2down" value="$(var is_channel_order_top2down)"/>
     <arg name="horizontal_resolution" value="$(var horizontal_resolution)"/>
     <arg name="enable_blockage_diag" value="$(var enable_blockage_diag)"/>
+    <arg name="view_direction" value="$(var view_direction)" />
+    <arg name="view_width" value="$(var view_width)" />
+    <arg name="vehicle_mirror_param_file" value="$(var vehicle_mirror_param_file)" />
+    <arg name="use_intra_process" value="false" />
+    <arg name="use_multithread" value="false" />
+    <arg name="dual_return_filter_param_file" value="$(var dual_return_filter_param_file)" />
   </include>
 
   <!-- Velodyne Monitor -->

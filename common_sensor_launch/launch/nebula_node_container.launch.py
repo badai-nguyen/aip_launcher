@@ -21,6 +21,7 @@ from launch.actions import OpaqueFunction
 from launch.actions import SetLaunchConfiguration
 from launch.conditions import IfCondition
 from launch.conditions import UnlessCondition
+from launch.conditions import LaunchConfigurationEquals
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.actions import LoadComposableNodes
@@ -28,6 +29,11 @@ from launch_ros.descriptions import ComposableNode
 from launch_ros.substitutions import FindPackageShare
 import yaml
 
+def get_dual_return_filter_info(context):
+    path = LaunchConfiguration("dual_return_filter_param_file").perform(context)
+    with open(path,"r") as f:
+        p = yaml.safe_load(f)["/**"]["ros__parameters"]
+    return p
 
 def get_lidar_make(sensor_name):
     if sensor_name[:6].lower() == "pandar":
@@ -113,6 +119,7 @@ def launch_setup(context, *args, **kwargs):
                         "cloud_min_angle",
                         "cloud_max_angle",
                         "dual_return_distance_threshold",
+                        "return_mode",
                     ),
                 },
             ],
@@ -124,6 +131,7 @@ def launch_setup(context, *args, **kwargs):
         )
     )
 
+    dual_return_filter_info = get_dual_return_filter_info(context)
     cropbox_parameters = create_parameter_dict("input_frame", "output_frame")
     cropbox_parameters["negative"] = True
 
@@ -245,6 +253,44 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    dual_return_filter_component = ComposableNode(
+        package="pointcloud_preprocessor",
+        plugin="pointcloud_preprocessor::DualReturnOutlierFilterComponent",
+        name="dual_return_filter",
+        remappings=[
+            ("input","rectified/pointcloud_ex"),
+            ("output","outlier_filtered/pointcloud")
+        ],
+        parameters=[
+            {
+                "vertical_bins":LaunchConfiguration("vertical_bins"),
+                "min_azimuth_deg": LaunchConfiguration("min_azimuth_deg"),
+                "max_azimuth_deg": LaunchConfiguration("max_azimuth_deg"),
+            }
+        ]+
+        [dual_return_filter_info],
+        extra_arguments=[{"use_intra_process_comms":LaunchConfiguration("use_intra_process")}],
+    )
+
+    dual_return_filter_component = ComposableNode(
+        package="pointcloud_preprocessor",
+        plugin="pointcloud_preprocessor::DualReturnOutlierFilterComponent",
+        name="dual_return_filter",
+        remappings=[
+            ("input","rectified/pointcloud_ex"),
+            ("output","outlier_filtered/pointcloud")
+        ],
+        parameters=[
+            {
+                "vertical_bins":LaunchConfiguration("vertical_bins"),
+                "min_azimuth_deg": LaunchConfiguration("min_azimuth_deg"),
+                "max_azimuth_deg": LaunchConfiguration("max_azimuth_deg"),
+            }
+        ]+
+        [dual_return_filter_info],
+        extra_arguments=[{"use_intra_process_comms":LaunchConfiguration("use_intra_process")}],
+    )
+
     blockage_diag_component = ComposableNode(
         package="pointcloud_preprocessor",
         plugin="pointcloud_preprocessor::BlockageDiagComponent",
@@ -280,8 +326,12 @@ def launch_setup(context, *args, **kwargs):
         target_container=container,
         condition=IfCondition(LaunchConfiguration("enable_blockage_diag")),
     )
-
-    return [container, driver_component_loader, blockage_diag_loader]
+    dual_return_filter_loader = LoadComposableNodes(
+        composable_node_descriptions=[dual_return_filter_component],
+        target_container=container,
+        condition=LaunchConfigurationEquals("return_mode","Dual")
+    )
+    return [container, dual_return_filter_loader, driver_component_loader, blockage_diag_loader]
 
 
 def generate_launch_description():
@@ -318,6 +368,10 @@ def generate_launch_description():
     )
     add_launch_arg("use_multithread", "False", "use multithread")
     add_launch_arg("use_intra_process", "False", "use ROS 2 component container communication")
+    add_launch_arg("vertical_bins","128")
+    add_launch_arg("return_mode","Strongest")
+    add_launch_arg("min_azimuth_deg", "0.0")
+    add_launch_arg("max_azimuth_deg", "360.0")
     add_launch_arg("container_name", "nebula_node_container")
     add_launch_arg("output_as_sensor_frame", "True", "output final pointcloud in sensor frame")
 
