@@ -5,15 +5,28 @@
 
   <group>
     <push-ros-namespace namespace="camera"/>
-    <group>
+      <group>
+        <push-ros-namespace namespace="camera0" />
+        <include file="$(find-pkg-share image_transport_decompressor)/launch/image_transport_decompressor.launch.xml">
+          <arg name="input_topic_name" value="image_rect_color/compressed" />
+          <arg name="output_topic_name" value="image_rect_color" />
+        </include> 
+        <include file="$(find-pkg-share image_diagnostics)/launch/image_diagnostics_node.launch.xml" />
+          <arg name="input_topic_name" value="image_rect_color" />
+        </include>
+      </group>
+
+
+    <!-- <group>
       <push-ros-namespace namespace="traffic_light"/>
 
-      <!-- (usb_cam_node is assumed to have launched on logging PC) -->
+      (usb_cam_node is assumed to have launched on logging PC)
       <node pkg="topic_tools" exec="relay" name="tl_camera_info_relay" output="log"
 	    args="$(var camera_type)/camera_info camera_info"/>
 
       <node pkg="topic_tools" exec="relay" name="tl_compressed_image_relay" output="log"
 	    args="$(var camera_type)/image_raw/compressed image_raw/compressed"/>
-    </group>
+    </group> -->
+
   </group>
 </launch>
