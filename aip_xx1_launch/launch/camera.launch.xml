@@ -6,64 +6,24 @@
   <group>
     <push-ros-namespace namespace="camera"/>
       <group>
-        <push-ros-namespace namespace="camera0" />
+        <push-ros-namespace namespace="c1" />
         <include file="$(find-pkg-share image_transport_decompressor)/launch/image_transport_decompressor.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color/compressed" />
-          <arg name="output_topic_name" value="image_rect_color" />
+          <arg name="input_topic_name" value="image_raw/compressed" />
+          <arg name="output_topic_name" value="image_raw" />
         </include> 
         <include file="$(find-pkg-share image_diagnostics)/launch/image_diagnostics_node.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color" />
+          <arg name="input_topic_name" value="image_raw" />
         </include>
       </group>
 
       <group>
-        <push-ros-namespace namespace="camera1" />
+        <push-ros-namespace namespace="c2" />
         <include file="$(find-pkg-share image_transport_decompressor)/launch/image_transport_decompressor.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color/compressed" />
-          <arg name="output_topic_name" value="image_rect_color" />
+          <arg name="input_topic_name" value="image_raw/compressed" />
+          <arg name="output_topic_name" value="image_raw" />
         </include> 
         <include file="$(find-pkg-share image_diagnostics)/launch/image_diagnostics_node.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color" />
-        </include>
-      </group>
-      <group>
-        <push-ros-namespace namespace="camera2" />
-        <include file="$(find-pkg-share image_transport_decompressor)/launch/image_transport_decompressor.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color/compressed" />
-          <arg name="output_topic_name" value="image_rect_color" />
-        </include> 
-        <include file="$(find-pkg-share image_diagnostics)/launch/image_diagnostics_node.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color" />
-        </include>
-      </group>
-      <group>
-        <push-ros-namespace namespace="camera3" />
-        <include file="$(find-pkg-share image_transport_decompressor)/launch/image_transport_decompressor.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color/compressed" />
-          <arg name="output_topic_name" value="image_rect_color" />
-        </include> 
-        <include file="$(find-pkg-share image_diagnostics)/launch/image_diagnostics_node.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color" />
-        </include>
-      </group>  
-      <group>
-        <push-ros-namespace namespace="camera4" />
-        <include file="$(find-pkg-share image_transport_decompressor)/launch/image_transport_decompressor.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color/compressed" />
-          <arg name="output_topic_name" value="image_rect_color" />
-        </include> 
-        <include file="$(find-pkg-share image_diagnostics)/launch/image_diagnostics_node.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color" />
-        </include>
-      </group>
-      <group>
-        <push-ros-namespace namespace="camera5" />
-        <include file="$(find-pkg-share image_transport_decompressor)/launch/image_transport_decompressor.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color/compressed" />
-          <arg name="output_topic_name" value="image_rect_color" />
-        </include> 
-        <include file="$(find-pkg-share image_diagnostics)/launch/image_diagnostics_node.launch.xml">
-          <arg name="input_topic_name" value="image_rect_color" />
+          <arg name="input_topic_name" value="image_raw" />
         </include>
       </group>
       
