@@ -5,15 +5,78 @@
 
   <group>
     <push-ros-namespace namespace="camera"/>
-    <group>
+      <group>
+      <push-ros-namespace namespace="camera0"/>
+        <group>
+        <arg name="input_topic_name" default="image_rect_color/compressed"/>
+        <arg name="output_topic_name" default="image_rect_color"/>
+        <node pkg="image_transport_decompressor" exec="image_transport_decompressor_node" name="$(anon image_transport_decompressor_node)">
+          <remap from="~/input/compressed_image" to="$(var input_topic_name)"/>
+          <remap from="~/output/raw_image" to="$(var output_topic_name)"/>
+        </node>
+        
+        </group>
+      </group>
+<!-- 
+      <group>
+      <push-ros-namespace namespace="camera2"/>
+        <group>
+        <arg name="input_topic_name" default="image_rect_color/compressed"/>
+        <arg name="output_topic_name" default="image_rect_color"/>
+        <node pkg="image_transport_decompressor" exec="image_transport_decompressor_node" name="$(anon image_transport_decompressor_node)">
+          <remap from="~/input/compressed_image" to="$(var input_topic_name)"/>
+          <remap from="~/output/raw_image" to="$(var output_topic_name)"/>
+        </node>
+        
+        </group>
+      </group>
+
+      <group>
+      <push-ros-namespace namespace="camera3"/>
+        <group>
+        <arg name="input_topic_name" default="image_rect_color/compressed"/>
+        <arg name="output_topic_name" default="image_rect_color"/>
+        <node pkg="image_transport_decompressor" exec="image_transport_decompressor_node" name="$(anon image_transport_decompressor_node)">
+          <remap from="~/input/compressed_image" to="$(var input_topic_name)"/>
+          <remap from="~/output/raw_image" to="$(var output_topic_name)"/>
+        </node>
+        
+        </group>
+      </group>
+
+      <group>
+      <push-ros-namespace namespace="camera4"/>
+        <group>
+        <arg name="input_topic_name" default="image_rect_color/compressed"/>
+        <arg name="output_topic_name" default="image_rect_color"/>
+        <node pkg="image_transport_decompressor" exec="image_transport_decompressor_node" name="$(anon image_transport_decompressor_node)">
+          <remap from="~/input/compressed_image" to="$(var input_topic_name)"/>
+          <remap from="~/output/raw_image" to="$(var output_topic_name)"/>
+        </node>
+        
+        </group>
+      </group>
+
+      <group>
+      <push-ros-namespace namespace="camera5"/>
+        <group>
+        <arg name="input_topic_name" default="image_rect_color/compressed"/>
+        <arg name="output_topic_name" default="image_rect_color"/>
+        <node pkg="image_transport_decompressor" exec="image_transport_decompressor_node" name="$(anon image_transport_decompressor_node)">
+          <remap from="~/input/compressed_image" to="$(var input_topic_name)"/>
+          <remap from="~/output/raw_image" to="$(var output_topic_name)"/>
+        </node>
+        
+        </group>
+      </group> -->
+    <!-- <group>
       <push-ros-namespace namespace="traffic_light"/>
 
-      <!-- (usb_cam_node is assumed to have launched on logging PC) -->
       <node pkg="topic_tools" exec="relay" name="tl_camera_info_relay" output="log"
 	    args="$(var camera_type)/camera_info camera_info"/>
 
       <node pkg="topic_tools" exec="relay" name="tl_compressed_image_relay" output="log"
 	    args="$(var camera_type)/image_raw/compressed image_raw/compressed"/>
-    </group>
+    </group> -->
   </group>
 </launch>
